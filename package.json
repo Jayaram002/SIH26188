@@ -1,0 +1,8 @@
+{
+  "name": "sih26188-aeroshield-ai",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "build": "if [ -d \"aeroshield-ai/frontend\" ]; then cd aeroshield-ai/frontend && npm install && npm run build; else npm install && npm run build; fi"
+  }
+}

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "cd aeroshield-ai/frontend && npm run build",
+  "buildCommand": "if [ -d \"aeroshield-ai/frontend\" ]; then cd aeroshield-ai/frontend && npm install && npm run build; else npm install && npm run build; fi",
   "outputDirectory": "aeroshield-ai/frontend/dist",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
