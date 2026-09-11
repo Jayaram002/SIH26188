@@ -1,7 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Eye, CheckCircle2, AlertTriangle, RefreshCw, Scan, ShieldCheck } from 'lucide-react';
+import { Eye, CheckCircle2, AlertTriangle, RefreshCw, Scan, ShieldAlert } from 'lucide-react';
 
 interface LiveCameraIrisScannerProps {
+  isFraudDemo?: boolean;
   onScanComplete: (result: {
     irisMatchResult: 'MATCH' | 'MISMATCH';
     similarityScore: number;
@@ -11,7 +12,7 @@ interface LiveCameraIrisScannerProps {
   }) => void;
 }
 
-export default function LiveCameraIrisScanner({ onScanComplete }: LiveCameraIrisScannerProps) {
+export default function LiveCameraIrisScanner({ isFraudDemo = false, onScanComplete }: LiveCameraIrisScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
@@ -70,8 +71,8 @@ export default function LiveCameraIrisScanner({ onScanComplete }: LiveCameraIris
   const runIrisMatching = (imgUrl: string) => {
     setIsScanning(true);
     setTimeout(() => {
-      const score = 98.4;
-      const match = 'MATCH';
+      const score = isFraudDemo ? 38.1 : 98.4;
+      const match = isFraudDemo ? 'MISMATCH' : 'MATCH';
       setSimilarity(score);
       setMatchStatus(match);
       setIsScanning(false);
@@ -79,21 +80,31 @@ export default function LiveCameraIrisScanner({ onScanComplete }: LiveCameraIris
       onScanComplete({
         irisMatchResult: match,
         similarityScore: score,
-        leftEyeScore: 98.7,
-        rightEyeScore: 98.1,
+        leftEyeScore: isFraudDemo ? 37.5 : 98.7,
+        rightEyeScore: isFraudDemo ? 38.7 : 98.1,
         capturedImageBlobUrl: imgUrl
       });
     }, 1400);
   };
 
   return (
-    <div className="bg-aviation-900 border border-aviation-700 rounded-xl p-6 shadow-xl">
+    <div className={`border rounded-xl p-6 shadow-xl transition-all ${
+      isFraudDemo && matchStatus === 'MISMATCH' 
+        ? 'bg-red-950/40 border-red-600/80' 
+        : 'bg-aviation-900 border-aviation-700'
+    }`}>
       <div className="flex items-center justify-between mb-4 border-b border-aviation-800 pb-3">
         <div className="flex items-center space-x-2">
-          <Eye className="w-5 h-5 text-cyan-400" />
-          <h3 className="text-base font-bold text-white tracking-wide">BIOMETRIC IRIS PATTERN RECOGNITION</h3>
+          <Eye className={`w-5 h-5 ${isFraudDemo ? 'text-red-400' : 'text-cyan-400'}`} />
+          <h3 className="text-base font-bold text-white tracking-wide">
+            BIOMETRIC IRIS PATTERN RECOGNITION {isFraudDemo ? '(FRAUD TEST ACTIVE)' : ''}
+          </h3>
         </div>
-        <span className="text-xs bg-cyan-950 text-cyan-300 font-mono px-3 py-1 rounded border border-cyan-800">
+        <span className={`text-xs font-mono px-3 py-1 rounded border ${
+          isFraudDemo 
+            ? 'bg-red-950 text-red-300 border-red-800' 
+            : 'bg-cyan-950 text-cyan-300 border-cyan-800'
+        }`}>
           INFRARED EYE SENSOR ACTIVE
         </span>
       </div>
@@ -107,23 +118,33 @@ export default function LiveCameraIrisScanner({ onScanComplete }: LiveCameraIris
               {/* Dual Eye Targeting Reticle */}
               <div className="absolute inset-0 flex items-center justify-center space-x-12 pointer-events-none">
                 {/* Left Eye Reticle */}
-                <div className="w-24 h-24 border-2 border-cyan-400/90 rounded-full flex items-center justify-center animate-pulse">
-                  <div className="w-12 h-12 border border-dashed border-cyan-300/80 rounded-full flex items-center justify-center">
-                    <div className="w-4 h-4 bg-cyan-400/40 rounded-full"></div>
+                <div className={`w-24 h-24 border-2 rounded-full flex items-center justify-center animate-pulse ${
+                  isFraudDemo ? 'border-red-500' : 'border-cyan-400/90'
+                }`}>
+                  <div className={`w-12 h-12 border border-dashed rounded-full flex items-center justify-center ${
+                    isFraudDemo ? 'border-red-400' : 'border-cyan-300/80'
+                  }`}>
+                    <div className={`w-4 h-4 rounded-full ${isFraudDemo ? 'bg-red-500/50' : 'bg-cyan-400/40'}`}></div>
                   </div>
                 </div>
 
                 {/* Right Eye Reticle */}
-                <div className="w-24 h-24 border-2 border-cyan-400/90 rounded-full flex items-center justify-center animate-pulse">
-                  <div className="w-12 h-12 border border-dashed border-cyan-300/80 rounded-full flex items-center justify-center">
-                    <div className="w-4 h-4 bg-cyan-400/40 rounded-full"></div>
+                <div className={`w-24 h-24 border-2 rounded-full flex items-center justify-center animate-pulse ${
+                  isFraudDemo ? 'border-red-500' : 'border-cyan-400/90'
+                }`}>
+                  <div className={`w-12 h-12 border border-dashed rounded-full flex items-center justify-center ${
+                    isFraudDemo ? 'border-red-400' : 'border-cyan-300/80'
+                  }`}>
+                    <div className={`w-4 h-4 rounded-full ${isFraudDemo ? 'bg-red-500/50' : 'bg-cyan-400/40'}`}></div>
                   </div>
                 </div>
               </div>
 
               <div className="absolute bottom-2 inset-x-0 text-center">
-                <span className="text-[10px] font-mono text-cyan-300 bg-black/80 px-3 py-1 rounded border border-cyan-800">
-                  ALIGN EYES WITH BLUE RETICLE TARGETS
+                <span className={`text-[10px] font-mono bg-black/80 px-3 py-1 rounded border ${
+                  isFraudDemo ? 'text-red-300 border-red-800' : 'text-cyan-300 border-cyan-800'
+                }`}>
+                  ALIGN EYES WITH TARGET RETICLES FOR IRIS GALTON SCAN
                 </span>
               </div>
             </div>
@@ -138,7 +159,7 @@ export default function LiveCameraIrisScanner({ onScanComplete }: LiveCameraIris
             <img src={capturedIris} alt="Captured Iris" className="w-full h-full object-cover" />
             {isScanning && (
               <div className="absolute inset-0 bg-aviation-950/85 backdrop-blur-xs flex flex-col items-center justify-center">
-                <Scan className="w-10 h-10 text-cyan-400 animate-spin mb-2" />
+                <Scan className={`w-10 h-10 animate-spin mb-2 ${isFraudDemo ? 'text-red-400' : 'text-cyan-400'}`} />
                 <span className="text-xs font-mono font-bold text-white tracking-widest">
                   ANALYZING IRIS GALTON PATTERNS...
                 </span>
@@ -153,16 +174,24 @@ export default function LiveCameraIrisScanner({ onScanComplete }: LiveCameraIris
       {/* Control Actions & Score Result */}
       <div className="mt-4 flex items-center justify-between">
         {matchStatus && (
-          <div className="flex items-center space-x-2 text-xs font-bold font-mono px-3 py-1.5 rounded border bg-emerald-950/80 text-emerald-300 border-emerald-500">
-            <CheckCircle2 className="w-4 h-4" />
-            <span>IRIS MATCH: {similarity}% (LEFT: 98.7% | RIGHT: 98.1%)</span>
+          <div className={`flex items-center space-x-2 text-xs font-bold font-mono px-3 py-1.5 rounded border ${
+            matchStatus === 'MATCH' 
+              ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500' 
+              : 'bg-red-950/80 text-red-300 border-red-500'
+          }`}>
+            {matchStatus === 'MATCH' ? <CheckCircle2 className="w-4 h-4" /> : <ShieldAlert className="w-4 h-4 text-red-400" />}
+            <span>
+              IRIS {matchStatus}: {similarity}% ({matchStatus === 'MATCH' ? 'LEFT: 98.7% | RIGHT: 98.1%' : 'FRAUD / ENROLLED PATTERN MISMATCH'})
+            </span>
           </div>
         )}
 
         {!capturedIris && hasWebcam && (
           <button
             onClick={handleCaptureIris}
-            className="ml-auto px-5 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs rounded-lg flex items-center gap-1.5 transition-colors shadow-lg"
+            className={`ml-auto px-5 py-2 text-white font-bold text-xs rounded-lg flex items-center gap-1.5 transition-colors shadow-lg ${
+              isFraudDemo ? 'bg-red-600 hover:bg-red-500' : 'bg-cyan-600 hover:bg-cyan-500'
+            }`}
           >
             <Eye className="w-4 h-4" />
             <span>SCAN BIOMETRIC IRIS</span>
