@@ -1,0 +1,8 @@
+{
+  "version": 2,
+  "buildCommand": "cd aeroshield-ai/frontend && npm run build",
+  "outputDirectory": "aeroshield-ai/frontend/dist",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
