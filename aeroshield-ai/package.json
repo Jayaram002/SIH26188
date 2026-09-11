@@ -1,0 +1,6 @@
+{
+  "devDependencies": {
+    "@neon/config": "^1.3.2",
+    "@neondatabase/serverless": "^1.1.0"
+  }
+}

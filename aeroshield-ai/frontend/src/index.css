@@ -1,0 +1,67 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #03060f;
+  --bg-secondary: #060d1f;
+  --bg-card: #080f1e;
+  --bg-card-hover: #0d1626;
+  --border-primary: #1a2a45;
+  --border-accent: #2352a0;
+  --text-primary: #e8f0fe;
+  --text-secondary: #7a9bc4;
+  --text-muted: #4a6080;
+  --accent-primary: #2352a0;
+  --accent-secondary: #3b6ec4;
+  --verified: #00c853;
+  --review: #ffb300;
+  --highrisk: #e53935;
+  --info: #2196f3;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb { background: var(--border-accent); border-radius: 3px; }
+
+/* Aviation panel style */
+.aviation-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+}
+
+/* Scan line animation */
+.scan-animation::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #3b6ec4, transparent);
+  animation: scanLine 2s ease-in-out infinite;
+}
+
+/* Glow effects */
+.glow-verified { box-shadow: 0 0 20px rgba(0, 200, 83, 0.3); }
+.glow-review { box-shadow: 0 0 20px rgba(255, 179, 0, 0.3); }
+.glow-highrisk { box-shadow: 0 0 20px rgba(229, 57, 53, 0.3); }
+.glow-blue { box-shadow: 0 0 20px rgba(59, 110, 196, 0.3); }
+
+/* Status dot */
+.status-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.status-dot.online { background: var(--verified); box-shadow: 0 0 6px var(--verified); }
+.status-dot.warning { background: var(--review); box-shadow: 0 0 6px var(--review); }
+.status-dot.offline { background: var(--highrisk); box-shadow: 0 0 6px var(--highrisk); }

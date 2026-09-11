@@ -1,0 +1,72 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: aeroshield_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: aeroshield_db
+      POSTGRES_USER: aeroshield
+      POSTGRES_PASSWORD: aeroshield_secret_2026
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aeroshield -d aeroshield_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - aeroshield_net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: aeroshield_backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://aeroshield:aeroshield_secret_2026@postgres:5432/aeroshield_db
+      SECRET_KEY: ${SECRET_KEY:-aeroshield-super-secret-key-change-in-production-2026}
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 480
+      DEMO_MODE: "true"
+      ENVIRONMENT: development
+      UPLOAD_DIR: /app/uploads
+      CORS_ORIGINS: '["http://localhost:5173","http://localhost:80","http://localhost"]'
+    volumes:
+      - ./backend:/app
+      - uploads_data:/app/uploads
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - aeroshield_net
+    command: >
+      sh -c "python scripts/seed_data.py && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: aeroshield_frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - aeroshield_net
+
+volumes:
+  postgres_data:
+  uploads_data:
+
+networks:
+  aeroshield_net:
+    driver: bridge
